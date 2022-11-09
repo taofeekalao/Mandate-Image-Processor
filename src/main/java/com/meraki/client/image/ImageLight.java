@@ -50,6 +50,11 @@ public class ImageLight {
     }
 
     public void processImage( String recordId) {
+        String TABLE_NAME = recordId.split("]")[1];
+        String imageId = recordId.split("]")[0];
+
+        System.out.println(TABLE_NAME);
+        System.out.println(imageId);
         byte imageByteArray[] = retrieveBaseSixtyFour(getConnection(), recordId);
         try {
             FileOutputStream fileOutputStream = new FileOutputStream("/Temenos/T24/bnk/UD/TEST.IM/" + recordId);

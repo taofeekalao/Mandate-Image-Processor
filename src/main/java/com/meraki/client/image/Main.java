@@ -8,10 +8,11 @@ public class Main {
 //        DbImageProcessor dbImageProcessor = new DbImageProcessor();
 //        dbImageProcessor.processImage("029260999819.jpg");
 //
-//        ImageLight imageLight = new ImageLight();
-//        imageLight.processImage("040160051212.jpg");
+        ImageLight imageLight = new ImageLight();
+        imageLight.processImage("20220118292729515.png]SIGNATURES]A");
 
-        DbImageAccess dbImageAccess = new DbImageAccess();
-        dbImageAccess.processImage(Integer.toString(2));
+
+//        DbImageAccess dbImageAccess = new DbImageAccess();
+//        dbImageAccess.processImage("20220118292729515.png]SIGNATURES]A");
     }
 }

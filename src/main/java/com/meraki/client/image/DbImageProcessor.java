@@ -4,7 +4,6 @@ import oracle.jdbc.OracleResultSet;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.sql.*;
 import java.util.Base64;
 
@@ -52,12 +51,8 @@ public class DbImageProcessor {
     }*/
 
 
-    private String retrieveBaseSixtyFour(Connection connection, String recordIdAndType) {
-
-        String TABLE_NAME = recordIdAndType.split("]")[1];
-        String imageId = recordIdAndType.split("]")[0];
+    private String retrieveBaseSixtyFour(Connection connection, String TABLE_NAME, String imageId) {
         Blob blob;
-        Blob blobs;
         String base64EncodedImageBytes = "";
 
         byte byteArray[] ;
@@ -69,39 +64,27 @@ public class DbImageProcessor {
                     blob = ((OracleResultSet)resultSet).getBLOB("XMLRECORD");
                     byteArray = blob.getBytes(1L, (int) blob.length());
                     base64EncodedImageBytes = Base64.getEncoder().encodeToString(byteArray);
-                    System.out.println(base64EncodedImageBytes);
                     blob.free();
-
-
-                    blobs = (Blob)resultSet.getObject("XMLRECORD");
-                    InputStream inputStream = blobs.getBinaryStream(1L, blobs.length());
-                    byte[] bytesArrayFromInputStream = new byte[(int) blobs.length()];
-                    inputStream.read(bytesArrayFromInputStream);
-                    String base64 = Base64.getEncoder().encodeToString(bytesArrayFromInputStream);
-                    System.out.println(base64);
-                    blobs.free();
-
-
                     connection.close();
                 }
             } catch (SQLException exception) {
                 exception.printStackTrace();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
             }
         }
 
         return base64EncodedImageBytes;
     }
 
-    public void processImage(String param) {
-        String base64EncodedImageBytes  = retrieveBaseSixtyFour(getConnection(), param);
+    public void processImage(String recordIdAndType) {
+        String TABLE_NAME = recordIdAndType.split("]")[1];
+        String imageId = recordIdAndType.split("]")[0];
+        String base64EncodedImageBytes  = retrieveBaseSixtyFour(getConnection(), TABLE_NAME, imageId);
         byte[] imageByteArray = javax.xml.bind.DatatypeConverter.parseBase64Binary(base64EncodedImageBytes);
-        DecodeAndWriteImageToFileFromAPI(imageByteArray, "jpg", param);
+        DecodeAndWriteImageToFileFromAPI(imageByteArray, imageId);
     }
 
 
-    private void DecodeAndWriteImageToFileFromAPI(byte[] imageByteArray, String format, String filename) {
+    private void DecodeAndWriteImageToFileFromAPI(byte[] imageByteArray, String filename) {
         try {
             FileOutputStream fileOutputStream = new FileOutputStream("/Temenos/T24/bnk/UD/TEST.IM/" + filename);
             fileOutputStream.write(imageByteArray);

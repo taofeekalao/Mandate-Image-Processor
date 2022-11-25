@@ -1,9 +1,7 @@
 package com.meraki.client.image;
 
 import oracle.jdbc.OracleResultSet;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.sql.*;
 import java.util.Base64;
 
@@ -12,14 +10,46 @@ public class DbImageProcessor {
     public DbImageProcessor() {
     }
 
-    static final String USERNAME = "t24";
-    static final String PASSWORD = "t24";
-    static final String CONNECTION_STRING = "jdbc:oracle:thin:@10.219.101.30:1521:BPRCHAN";
+    static String USERNAME;
+    static String PASSWORD;
+    static String CONNECTION_STRING;
+
+    private void propertyFileReader() {
+        BufferedReader bufferedReader = null;
+        try {
+            String path = System.getProperty("user.dir");
+            Reader reader = new FileReader(path + "/conf/application.properties");
+            bufferedReader = new BufferedReader(reader);
+            String lineString;
+            while (null != (lineString = bufferedReader.readLine())) {
+                String key = lineString.split("=")[0];
+                String value = lineString.split("=")[1];;
+
+                switch (key) {
+                    case "username":
+                        USERNAME = value;
+                        break;
+
+                    case "password":
+                        PASSWORD = value;
+                        break;
+
+                    case "dbConnection":
+                        CONNECTION_STRING = value;
+                        break;
+                }
+            }
+            bufferedReader.close();
+        } catch (IOException fileNotFoundException) {
+            fileNotFoundException.getMessage();
+        }
+
+    }
 
     private Connection getConnection() {
         Connection connection = null;
         try {
-            Class.forName ("oracle.jdbc.OracleDriver");
+            Class.forName("oracle.jdbc.OracleDriver");
             connection = DriverManager.getConnection(CONNECTION_STRING, USERNAME, PASSWORD);
         } catch (Exception exception) {
             exception.printStackTrace();
@@ -27,47 +57,27 @@ public class DbImageProcessor {
         return connection;
     }
 
-/*    private String retrieveBaseSixtyFour(Connection connection, String recordId) {
-        Blob blob;
-        String base64EncodedImageBytes = "";
-        byte byteArray[] ;
-        if (null != connection) {
-            try {
-                PreparedStatement preparedStatement = connection.prepareStatement("SELECT XMLRECORD FROM PHOTOS WHERE RECID = " + "'" + recordId + "'");
-                ResultSet resultSet = preparedStatement.executeQuery();
-                if (resultSet.next()) {
-                    blob = resultSet.getBlob("XMLRECORD");
-                    byteArray = blob.getBytes(1L, (int) blob.length());
-                    base64EncodedImageBytes = Base64.getEncoder().encodeToString(byteArray);
-                    blob.free();
-                    connection.close();
-                }
-            } catch (SQLException exception) {
-                exception.printStackTrace();
-            }
-        }
-
-        return base64EncodedImageBytes;
-    }*/
-
-
     private String retrieveBaseSixtyFour(Connection connection, String TABLE_NAME, String imageId) {
         Blob blob;
         String base64EncodedImageBytes = "";
 
-        byte byteArray[] ;
+        byte byteArray[];
         if (null != connection) {
             try {
                 PreparedStatement preparedStatement = connection.prepareStatement("SELECT XMLRECORD FROM " + TABLE_NAME + " WHERE RECID = " + "'" + imageId + "'");
                 ResultSet resultSet = preparedStatement.executeQuery();
                 if (resultSet.next()) {
-                    blob = ((OracleResultSet)resultSet).getBLOB("XMLRECORD");
+                    blob = ((OracleResultSet) resultSet).getBLOB("XMLRECORD");
                     byteArray = blob.getBytes(1L, (int) blob.length());
                     base64EncodedImageBytes = Base64.getEncoder().encodeToString(byteArray);
                     blob.free();
                     connection.close();
                 }
             } catch (SQLException exception) {
+                exception.getMessage();
+                System.out.println(exception.getMessage());
+                System.out.println(exception.getCause());
+                System.out.println(exception.getErrorCode());
                 exception.printStackTrace();
             }
         }
@@ -76,23 +86,23 @@ public class DbImageProcessor {
     }
 
     public void processImage(String recordIdAndType) {
-        String TABLE_NAME = recordIdAndType.split("]")[1];
+        propertyFileReader();
         String imageId = recordIdAndType.split("]")[0];
-        String base64EncodedImageBytes  = retrieveBaseSixtyFour(getConnection(), TABLE_NAME, imageId);
+        String TABLE_NAME = recordIdAndType.split("]")[1];
+        String filePath = recordIdAndType.split("]")[2];
+        String base64EncodedImageBytes = retrieveBaseSixtyFour(getConnection(), TABLE_NAME, imageId);
         byte[] imageByteArray = javax.xml.bind.DatatypeConverter.parseBase64Binary(base64EncodedImageBytes);
-        DecodeAndWriteImageToFileFromAPI(imageByteArray, imageId);
+        DecodeAndWriteImageToFileFromAPI(imageByteArray, imageId, filePath);
     }
 
-
-    private void DecodeAndWriteImageToFileFromAPI(byte[] imageByteArray, String filename) {
+    private void DecodeAndWriteImageToFileFromAPI(byte[] imageByteArray, String filename, String filePath) {
+        System.out.println("Printing File Path :" + filePath);
         try {
-            FileOutputStream fileOutputStream = new FileOutputStream("/Temenos/T24/bnk/UD/TEST.IM/" + filename);
+            FileOutputStream fileOutputStream = new FileOutputStream("/Temenos/jboss/standalone/Images/shares/im.images/signatures/" + filename);
             fileOutputStream.write(imageByteArray);
             fileOutputStream.close();
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } catch (IOException fileNotFoundException) {
+            fileNotFoundException.getMessage();
         }
     }
 }

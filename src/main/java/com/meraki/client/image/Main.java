@@ -5,11 +5,12 @@ import test.com.meraki.client.image.DbImageAccess;
 public class Main {
 
     public static void main(String[] args) {
-//        DbImageProcessor dbImageProcessor = new DbImageProcessor();
+        DbImageProcessor dbImageProcessor = new DbImageProcessor();
 //        dbImageProcessor.processImage("029260999819.jpg");
+
 //
         ImageLight imageLight = new ImageLight();
-        imageLight.processImage("20220118292729515.png]SIGNATURES]A");
+        dbImageProcessor.processImage("20220118912240978.png]SIGNATURES]A");
 
 
 //        DbImageAccess dbImageAccess = new DbImageAccess();

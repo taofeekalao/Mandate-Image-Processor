@@ -23,7 +23,9 @@ public class DbImageProcessor {
             String lineString;
             while (null != (lineString = bufferedReader.readLine())) {
                 String key = lineString.split("=")[0];
-                String value = lineString.split("=")[1];;
+                String encodedValue = lineString.split("=")[1];
+                byte[] decodedValueInByte = Base64.getDecoder().decode(encodedValue);
+                String value = new String(decodedValueInByte);
 
                 switch (key) {
                     case "username":

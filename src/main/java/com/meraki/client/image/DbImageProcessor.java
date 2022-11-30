@@ -28,10 +28,6 @@ public class DbImageProcessor {
             USERNAME = new String(Base64.getDecoder().decode(appProperties.getProperty("username")));
             PASSWORD = new String(Base64.getDecoder().decode(appProperties.getProperty("password")));
             CONNECTION_STRING = new String(Base64.getDecoder().decode(appProperties.getProperty("dbConnection")));
-            System.out.println("This is the user name : " + USERNAME);
-            System.out.println("This is the password : " + PASSWORD);
-            System.out.println("This is the connection string : " + CONNECTION_STRING);
-
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

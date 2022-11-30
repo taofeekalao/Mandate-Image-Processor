@@ -18,7 +18,7 @@ public class DbImageProcessor {
         BufferedReader bufferedReader = null;
         try {
             String path = System.getProperty("user.dir");
-            Reader reader = new FileReader(path + "/conf/application.properties");
+            Reader reader = new FileReader(path + "/src/main/resources/config/application.properties");
             bufferedReader = new BufferedReader(reader);
             String lineString;
             while (null != (lineString = bufferedReader.readLine())) {
@@ -30,22 +30,25 @@ public class DbImageProcessor {
                 switch (key) {
                     case "username":
                         USERNAME = value;
+                        System.out.println("This is the user name : " + USERNAME);
                         break;
 
                     case "password":
                         PASSWORD = value;
+                        System.out.println("This is the password : " + PASSWORD);
                         break;
 
                     case "dbConnection":
                         CONNECTION_STRING = value;
+                        System.out.println("This is the connection string : " + CONNECTION_STRING);
                         break;
                 }
             }
+
             bufferedReader.close();
         } catch (IOException fileNotFoundException) {
             fileNotFoundException.getMessage();
         }
-
     }
 
     private Connection getConnection() {
@@ -98,7 +101,6 @@ public class DbImageProcessor {
     }
 
     private void DecodeAndWriteImageToFileFromAPI(byte[] imageByteArray, String filename, String filePath) {
-        System.out.println("Printing File Path :" + filePath);
         try {
             FileOutputStream fileOutputStream = new FileOutputStream("/Temenos/jboss/standalone/Images/shares/im.images/signatures/" + filename);
             fileOutputStream.write(imageByteArray);

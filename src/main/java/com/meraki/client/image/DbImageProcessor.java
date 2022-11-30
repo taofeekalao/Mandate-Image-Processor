@@ -1,9 +1,13 @@
 package com.meraki.client.image;
 
 import oracle.jdbc.OracleResultSet;
+
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.sql.*;
 import java.util.Base64;
+import java.util.Properties;
 
 public class DbImageProcessor {
 
@@ -14,40 +18,24 @@ public class DbImageProcessor {
     static String PASSWORD;
     static String CONNECTION_STRING;
 
-    private void propertyFileReader() {
-        BufferedReader bufferedReader = null;
+    private static final Properties appProperties;
+
+    static {
+        appProperties = new Properties();
         try {
-            String path = System.getProperty("user.dir");
-            Reader reader = new FileReader(path + "/src/main/resources/config/application.properties");
-            bufferedReader = new BufferedReader(reader);
-            String lineString;
-            while (null != (lineString = bufferedReader.readLine())) {
-                String key = lineString.split("=")[0];
-                String encodedValue = lineString.split("=")[1];
-                byte[] decodedValueInByte = Base64.getDecoder().decode(encodedValue);
-                String value = new String(decodedValueInByte);
+            ClassLoader classLoader = DbImageProcessor.class.getClassLoader();
+            InputStream applicationPropertiesStream = classLoader.getResourceAsStream("application.properties");
+            appProperties.load(applicationPropertiesStream);
+            USERNAME = appProperties.getProperty("username");
+            PASSWORD = appProperties.getProperty("password");
+            CONNECTION_STRING = appProperties.getProperty("dbConnection");
+            System.out.println("This is the user name : " + USERNAME);
+            System.out.println("This is the password : " + PASSWORD);
+            System.out.println("This is the connection string : " + CONNECTION_STRING);
 
-                switch (key) {
-                    case "username":
-                        USERNAME = value;
-                        System.out.println("This is the user name : " + USERNAME);
-                        break;
-
-                    case "password":
-                        PASSWORD = value;
-                        System.out.println("This is the password : " + PASSWORD);
-                        break;
-
-                    case "dbConnection":
-                        CONNECTION_STRING = value;
-                        System.out.println("This is the connection string : " + CONNECTION_STRING);
-                        break;
-                }
-            }
-
-            bufferedReader.close();
-        } catch (IOException fileNotFoundException) {
-            fileNotFoundException.getMessage();
+            applicationPropertiesStream.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -91,7 +79,6 @@ public class DbImageProcessor {
     }
 
     public void processImage(String recordIdAndType) {
-        propertyFileReader();
         String imageId = recordIdAndType.split("]")[0];
         String TABLE_NAME = recordIdAndType.split("]")[1];
         String filePath = recordIdAndType.split("]")[2];

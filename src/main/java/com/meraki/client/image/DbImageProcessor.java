@@ -22,9 +22,8 @@ public class DbImageProcessor {
 
     static {
         appProperties = new Properties();
-        try {
-            ClassLoader classLoader = DbImageProcessor.class.getClassLoader();
-            InputStream applicationPropertiesStream = classLoader.getResourceAsStream("application.properties");
+        try (InputStream applicationPropertiesStream = DbImageProcessor.class.getClassLoader().getResourceAsStream("application.properties");
+        ){
             appProperties.load(applicationPropertiesStream);
             USERNAME = new String(Base64.getDecoder().decode(appProperties.getProperty("username")));
             PASSWORD = new String(Base64.getDecoder().decode(appProperties.getProperty("password")));
@@ -33,7 +32,6 @@ public class DbImageProcessor {
             System.out.println("This is the password : " + PASSWORD);
             System.out.println("This is the connection string : " + CONNECTION_STRING);
 
-            applicationPropertiesStream.close();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

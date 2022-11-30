@@ -26,9 +26,9 @@ public class DbImageProcessor {
             ClassLoader classLoader = DbImageProcessor.class.getClassLoader();
             InputStream applicationPropertiesStream = classLoader.getResourceAsStream("application.properties");
             appProperties.load(applicationPropertiesStream);
-            USERNAME = appProperties.getProperty("username");
-            PASSWORD = appProperties.getProperty("password");
-            CONNECTION_STRING = appProperties.getProperty("dbConnection");
+            USERNAME = new String(Base64.getDecoder().decode(appProperties.getProperty("username")));
+            PASSWORD = new String(Base64.getDecoder().decode(appProperties.getProperty("password")));
+            CONNECTION_STRING = new String(Base64.getDecoder().decode(appProperties.getProperty("dbConnection")));
             System.out.println("This is the user name : " + USERNAME);
             System.out.println("This is the password : " + PASSWORD);
             System.out.println("This is the connection string : " + CONNECTION_STRING);

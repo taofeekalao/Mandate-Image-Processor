@@ -3,8 +3,6 @@ package com.meraki.client.image;
 import oracle.jdbc.OracleResultSet;
 
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.sql.*;
 import java.util.Base64;
 import java.util.Properties;
@@ -48,7 +46,7 @@ public class DbImageProcessor {
         Blob blob;
         String base64EncodedImageBytes = "";
 
-        byte byteArray[];
+        byte[] byteArray;
         if (null != connection) {
             try {
                 PreparedStatement preparedStatement = connection.prepareStatement("SELECT XMLRECORD FROM " + TABLE_NAME + " WHERE RECID = " + "'" + imageId + "'");
@@ -61,14 +59,9 @@ public class DbImageProcessor {
                     connection.close();
                 }
             } catch (SQLException exception) {
-                exception.getMessage();
-                System.out.println(exception.getMessage());
-                System.out.println(exception.getCause());
-                System.out.println(exception.getErrorCode());
                 exception.printStackTrace();
             }
         }
-
         return base64EncodedImageBytes;
     }
 
@@ -87,7 +80,7 @@ public class DbImageProcessor {
             fileOutputStream.write(imageByteArray);
             fileOutputStream.close();
         } catch (IOException fileNotFoundException) {
-            fileNotFoundException.getMessage();
+            fileNotFoundException.printStackTrace();
         }
     }
 }

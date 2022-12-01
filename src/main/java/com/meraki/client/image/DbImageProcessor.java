@@ -16,16 +16,16 @@ public class DbImageProcessor {
     static String PASSWORD;
     static String CONNECTION_STRING;
 
-    private static final Properties appProperties;
+    private static final Properties appProperties = new Properties();
 
-    static {
-        appProperties = new Properties();
+    private void propertyFileReader() {
         try {
-            InputStream applicationPropertiesStream = DbImageProcessor.class.getClassLoader().getResourceAsStream("application.properties");
+            InputStream applicationPropertiesStream = DbImageProcessor.class.getClassLoader().getResourceAsStream("app.properties");
             appProperties.load(applicationPropertiesStream);
             USERNAME = new String(Base64.getDecoder().decode(appProperties.getProperty("username")));
             PASSWORD = new String(Base64.getDecoder().decode(appProperties.getProperty("password")));
             CONNECTION_STRING = new String(Base64.getDecoder().decode(appProperties.getProperty("dbConnection")));
+            System.out.println(CONNECTION_STRING);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -66,6 +66,7 @@ public class DbImageProcessor {
     }
 
     public void processImage(String recordIdAndType) {
+        propertyFileReader();
         String imageId = recordIdAndType.split("]")[0];
         String TABLE_NAME = recordIdAndType.split("]")[1];
         String filePath = recordIdAndType.split("]")[2];

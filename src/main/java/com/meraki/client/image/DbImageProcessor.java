@@ -20,8 +20,8 @@ public class DbImageProcessor {
 
     static {
         appProperties = new Properties();
-        try (InputStream applicationPropertiesStream = DbImageProcessor.class.getClassLoader().getResourceAsStream("application.properties");
-        ){
+        try {
+            InputStream applicationPropertiesStream = DbImageProcessor.class.getClassLoader().getResourceAsStream("application.properties");
             appProperties.load(applicationPropertiesStream);
             USERNAME = new String(Base64.getDecoder().decode(appProperties.getProperty("username")));
             PASSWORD = new String(Base64.getDecoder().decode(appProperties.getProperty("password")));
